@@ -2,15 +2,10 @@ import telebot
 import requests
 from telebot import types
 
-# vk_session = vk_api.VkApi('+71234567890', 'mypassword')
-# vk_session.auth()
-
-# vk = vk_session.get_api()
-
-
 
 token='983189915:AAH1SHYguP5syZ_p6jdf42pXb1mk2xftz7A'
 bot=telebot.TeleBot(token)
+
 
 @bot.message_handler(commands=['start', 'help'])
 def start(message):
@@ -23,18 +18,20 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton("NBA")
     btn2 = types.KeyboardButton("Искусство слова")
-    btn3 = types.KeyboardButton("AnimeVost.org")
+    btn3 = types.KeyboardButton("AnimeVost")
     btn4 = types.KeyboardButton("Life-Hack")
-    
-    
-    
+        
     markup.add(btn1, btn2,btn3,btn4)
+    bot.send_message(message.chat.id,'Выберите один из пунктов из "меню"' ,reply_markup=markup)
 
-    # bot.send_message(message.chat.id, reply_markup=markup)
+    
+
+
+
 
 @bot.message_handler(commands=['info'])
 def info(message):
-    start_info='Этот бот помогает читать 10 статии не заходя к сайту. Группы такие как: \n1. NBA, \n2. Искусство слова, \n3. AnimeVost, \n4. Life-Hack '
+    start_info='Этот бот помогает читать 10 статии не заходя к сайту. Группы такие как: \n1. NBA, \n2. Искусство слова, \n3. AnimeVost, \n4. Life-Hack\nВы можете их открыть в рахделе меню. '
 
     #keyboard
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -52,7 +49,7 @@ def get_nba_posts():
     count = 10
     offset = 0
     all_posts = []
-    while offset < 20:
+    while offset < 10:
         response = requests.get('https://api.vk.com/method/wall.get',
         params={
                 'access_token': token,
@@ -71,7 +68,7 @@ def get_nba_posts():
 def get_names(message):
     if message.text.lower() == 'nba':
         for post in get_nba_posts():
-            print(post)
+            # print(post)
             article=post['text']
             try:
                 post_video_url=post['attachments'][0]['link']['url']
@@ -83,6 +80,22 @@ def get_names(message):
                 post_image=''
             full_message=f'{article} \n {post_video_url} \n {post_image} '
             bot.send_message(message.chat.id, full_message )
+
+    keyboard = types.InlineKeyboardMarkup()
+
+    ewe10 = types.InlineKeyboardButton("+10 постов", switch_inline_query="Telegram")
+    nazad = types.InlineKeyboardButton("Назад", switch_inline_query="Telegram")
+    keyboard.add(ewe10, nazad)
+
+    bot.send_message(message.chat.id, "Вы можете посмотреть еще +10 постов, либо отмотать назад.", reply_markup=keyboard)
+    
+    if keyboard.add(ewe10)==True:
+        get_nba_posts()
+        
+
+        
+
+
 
 
 
